@@ -8,11 +8,11 @@ const int SCREEN_HEIGHT = 360 * 2;
 const double SPRITE_SIZE = 8;
 const int OBSTACLE_AMOUNT = 0;
 
-const int AMOUNT = 660;
+const int AMOUNT = 1600;
 const double FLOCK_RADIUS = 60;
 const double BOID_SPEED = .15;
 
-const double SEPERATION_STRENGTH    = 2.01;
+const double SEPERATION_STRENGTH    = 2.02;
 const double ALIGNMENT_STRENGTH     = 1;
 const double COHESION_STRENGTH      = 2;
 const double AVOID                  = 18;
@@ -102,8 +102,8 @@ struct Boid* CreateBoids()
         boids[i].dir.x = -1 + ((float)rand() / (float)RAND_MAX) * 2;
         boids[i].dir.y = -1 + ((float)rand() / (float)RAND_MAX) * 2;
 
-        boids[i].depth = 0.5 + (float)rand() / (float)RAND_MAX;
-        //boids[i].depth = 0.5 + (double)(i + 1) / (double)AMOUNT;
+        //boids[i].depth = 0.5 + (float)rand() / (float)RAND_MAX;
+        boids[i].depth = 0.5 + (double)(i + 1) / (double)(AMOUNT);
     }
 
     return boids;
@@ -138,6 +138,7 @@ void RefreshWindow(SDL_Renderer *renderer, const struct Boid *boids, const struc
         SDL_SetRenderDrawColor(renderer,  p+20, p+50, p, 255);
 
         const double BOID_SIZE = (SPRITE_SIZE * boids[i].depth + BOID_SIZE) / 2.0;
+
         SDL_Rect rect;
         rect.x = boids[i].pos.x - BOID_SIZE / 2.0;
         rect.y = /*SCREEN_HEIGHT - */(boids[i].pos.y - BOID_SIZE / 2.0);
@@ -210,7 +211,7 @@ void GetLocalBoids(struct Boid *boids, const int index, struct Flock *flock)
 
     for (int i = 0; i < AMOUNT; i++)
     {
-        if(i == index || fabs(boids[i].depth - boids[index].depth) >= .25)
+        if(i == index || fabs(boids[i].depth - boids[index].depth) >= .2)
             continue;
         
         struct Vec2 distance;
@@ -337,9 +338,9 @@ void Tick(struct Boid *boids, struct Vec2 *obstacles, double delta)
 
         SetLength(&boid->dir, BOID_SPEED * boid->depth * delta);
         TranslateVector(&boid->pos, &boid->dir);
-        const double leasure = 200;
-        boid->pos.x = Loop(boid->pos.x, -leasure, SCREEN_WIDTH + leasure);
-        boid->pos.y = Loop(boid->pos.y, -leasure, SCREEN_HEIGHT + leasure);
+        boid->pos.x = Loop(boid->pos.x, 0, SCREEN_WIDTH );
+        boid->pos.y = Loop(boid->pos.y, 0, SCREEN_HEIGHT);
+        Normalize(&boid->dir);
     }
 }
 
